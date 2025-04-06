@@ -1,7 +1,19 @@
+<div align="center">
+
 # pgbenchmark
 
-`pgbenchmark` is a Python package to benchmark query performance on a PostgreSQL database. It allows you to measure the
+[![codecov](https://codecov.io/github/GujaLomsadze/pgbenchmark/graph/badge.svg?token=J2VYSHFE1K)](https://codecov.io/github/GujaLomsadze/pgbenchmark)
+(Yes, I know...)
+
+</div>
+
+<h3>
+Python package to benchmark query performance on a PostgreSQL database. It allows you to measure the
 execution time of queries over multiple runs, providing detailed metrics about each run's performance.
+</h3>
+
+
+---
 
 ## ⚠️ This library is under HEAVY development ⚠️ <br> I'll try to keep everything backwards compatible...
 
