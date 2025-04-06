@@ -29,16 +29,10 @@ def main(sql, runs, visualize, host, port, user, password):
         start_server_background()
 
     benchmark = Benchmark(conn, runs)
-    benchmark.set_sql("select 1;")
+    benchmark.set_sql(sql)
 
-    i = 0
-    for result in benchmark:
-        print(result)
-        if i == 1000:
-            benchmark.set_sql("SELECT pg_sleep(0.1);")
-        time.sleep(0.01)
-        i += 1
-
+    for _ in benchmark:
+        pass
 
 
 if __name__ == "__main__":
