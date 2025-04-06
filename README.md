@@ -3,7 +3,8 @@
 # pgbenchmark
 
 [![codecov](https://codecov.io/github/GujaLomsadze/pgbenchmark/graph/badge.svg?token=J2VYSHFE1K)](https://codecov.io/github/GujaLomsadze/pgbenchmark)
-(Yes, I know...)
+![PyPI Version](https://img.shields.io/pypi/v/pgbenchmark.svg)
+![PyPI Downloads](https://img.shields.io/pypi/dm/pgbenchmark.svg)
 
 </div>
 
