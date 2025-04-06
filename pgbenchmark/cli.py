@@ -9,7 +9,7 @@ from pgbenchmark.server import start_server_background
 @click.command()
 @click.option('--sql', default='SELECT 1;', help='SQL Statement to Benchmark')
 @click.option('--runs', default=1000, help='Number of runs for Benchmark')
-@click.option('--visualize', default=True, type=click.BOOL, help='Enable visualization for the benchmark')
+@click.option('--visualize', default=False, type=click.BOOL, help='Enable visualization for the benchmark')
 @click.option('--host', default='localhost', help='Database host')
 @click.option('--port', default=5433, help='Database port')
 @click.option('--user', default='postgres', help='Database user')

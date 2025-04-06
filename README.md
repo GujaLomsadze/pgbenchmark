@@ -5,7 +5,9 @@ execution time of queries over multiple runs, providing detailed metrics about e
 
 ## ⚠️ This library is under HEAVY development ⚠️ <br> I'll try to keep everything backwards compatible...
 
-## Getting Started
+---
+
+## Installation
 
 ```shell
 pip install pgbenchmark
@@ -13,7 +15,7 @@ pip install pgbenchmark
 
 ---
 
-## Extremely simple setup.
+# Example
 
 ```python
 import psycopg2
@@ -50,3 +52,29 @@ conn = engine.connect()
 # Set up benchmark class
 benchmark = Benchmark(db_connection=conn, number_of_runs=5)
 ```
+
+---
+
+# Example with CLI
+
+`pgbenchmark` Support CLI for easier and faster usages. If you need to check one quick SQL statement(s) without
+boilerplate and Messing around in code, simply install the library and run:
+
+```shell
+pgbenchmark --sql "SELECT 1;" --runs=1_000_000
+```
+
+### If your benchmark runs long enough, you can view live visualization
+
+### Add `--visualize=True` flag
+
+```shell
+pgbenchmark --sql "SELECT 1;" --runs=1_000_000 --visualize=True
+```
+
+After running pgbenchmark, go
+to <a href="http://127.0.0.1:4761" class="external-link" target="_blank">http://127.0.0.1:4761</a>.
+
+<img src="examples/ui_screenshot.png" alt="img.png" width="900"/>
+
+It is live enough for you to have fun. You can choose between `100ms` and `5000ms` refresh intervals.
