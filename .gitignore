@@ -3,3 +3,6 @@ test*
 dist*
 pgbenchmark.egg-info*
 build*
+pgbenchmark/__pycache__/
+*.pyc
+__pycache__/

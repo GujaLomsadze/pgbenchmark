@@ -1,0 +1,1 @@
+-e git+ssh://git@github.com/GujaLomsadze/pgbenchmark.git@3042880eace8d76c1e6e3f6a902e38269c86d026#egg=pgbenchmark

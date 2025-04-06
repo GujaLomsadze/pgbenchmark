@@ -18,7 +18,6 @@ class Benchmark:
         self,
         db_connection: Union[any, "SQLAlchemyConnection"],
         number_of_runs: int = 1,
-        visualize: bool = False,
     ):
         """
         :param db_connection: psycopg2 or SQLAlchemy connection object
@@ -31,14 +30,12 @@ class Benchmark:
         self.execution_times = []
         self._run_timestamps = []
         self._paused = False
-        self._visualize = visualize
         self._webserver_thread = None
         self._is_sqlalchemy = SQLAlchemyConnection is not None and isinstance(db_connection, SQLAlchemyConnection)
 
-        global_bench = self
+        global shared_benchmark
+        shared_benchmark = self
 
-        if self._visualize:
-            self._start_web_server()
 
     def set_sql(self, query: str):
         if os.path.isfile(query):

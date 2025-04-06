@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time D3 Line Chart</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        .chart-container {
+            width: 100vw; /* Full width */
+            height: 90vh; /* Full height minus the controls */
+            padding: 20px;
+        }
+        .axis--x path,
+        .axis--y path {
+            display: none; /* Hides the default axis line */
+        }
+        .axis--x line,
+        .axis--y line {
+            stroke: #444; /* Custom axis color */
+        }
+        .line {
+            fill: none;
+            stroke: rgba(75, 192, 192, 1);
+            stroke-width: 2;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Real-Time Benchmark Timeseries</h1>
+    <div class="chart-container" id="chartContainer"></div>
+    <div style="text-align: center; padding: 10px;">
+        <label for="zoom">Zoom Level:</label>
+        <input type="range" id="zoom" min="1" max="10" value="1" step="0.1">
+    </div>
+
+    <script>
+        const margin = {top: 20, right: 20, bottom: 30, left: 50};
+        const width = window.innerWidth - margin.left - margin.right;
+        const height = window.innerHeight * 0.9 - margin.top - margin.bottom;
+
+        const svg = d3.select("#chartContainer").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        const x = d3.scaleTime().range([0, width]);
+        const y = d3.scaleLinear().range([height, 0]);
+
+        const line = d3.line()
+            .x(d => x(new Date(d.sent_at))) // Ensure sent_at is parsed as date
+            .y(d => y(d.duration));
+
+        const gX = svg.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", `translate(0, ${height})`);
+
+        const gY = svg.append("g")
+            .attr("class", "axis axis--y");
+
+        let data = [];
+        const socket = new WebSocket('ws://localhost:4761/ws/data'); // Update with your FastAPI server port
+
+        socket.onmessage = function(event) {
+            const newData = JSON.parse(event.data);
+            // Assume newData contains sent_at and duration
+            data.push(newData);
+            updateChart();
+        };
+
+        function updateChart() {
+            x.domain(d3.extent(data, d => new Date(d.sent_at)));
+            y.domain([0, d3.max(data, d => d.duration)]);
+
+            gX.call(d3.axisBottom(x));
+            gY.call(d3.axisLeft(y));
+
+            // Draw the line
+            svg.selectAll(".line").remove(); // Clear previous line
+            svg.append("path")
+                .datum(data)
+                .attr("class", "line")
+                .attr("d", line);
+
+            // Zoom functionality
+            const zoomLevel = parseFloat(document.getElementById("zoom").value);
+            svg.attr("transform", `scale(${zoomLevel})`);
+        }
+
+        // Zoom Event Listener
+        document.getElementById("zoom").addEventListener("input", updateChart);
+
+    </script>
+</body>
+</html>
