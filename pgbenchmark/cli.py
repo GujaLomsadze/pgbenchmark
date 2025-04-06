@@ -15,8 +15,6 @@ from pgbenchmark.server import start_server_background
 @click.option('--user', default='postgres', help='Database user')
 @click.option('--password', default='asdASD123', help='Database password')
 def main(sql, runs, visualize, host, port, user, password):
-    print(host, port, user, password)
-
     conn = psycopg2.connect(
         dbname="postgres",
         user=user,
@@ -27,12 +25,22 @@ def main(sql, runs, visualize, host, port, user, password):
 
     if visualize:
         start_server_background()
+        print("[ http://127.0.0.1:4761 ] Click to view Live benchmark timeseries")
 
     benchmark = Benchmark(conn, runs)
     benchmark.set_sql(sql)
 
     for _ in benchmark:
         pass
+
+    print(f"\n--- Benchmark Complete\n")
+
+    execution_results = benchmark.get_execution_results()
+
+    print(f"Runs: [{execution_results['runs']}]")
+    print(f"Minimum Time: [{execution_results['min_time']}] seconds")
+    print(f"Maximum Time: [{execution_results['max_time']}] seconds")
+    print(f"Average Time: [{execution_results['avg_time']}] seconds")
 
 
 if __name__ == "__main__":
