@@ -9,15 +9,14 @@ try:
 except ImportError:
     SQLAlchemyConnection = None
 
-
 shared_benchmark = None
 
 
 class Benchmark:
     def __init__(
-        self,
-        db_connection: Union[any, "SQLAlchemyConnection"],
-        number_of_runs: int = 1,
+            self,
+            db_connection: Union[any, "SQLAlchemyConnection"],
+            number_of_runs: int = 1,
     ):
         """
         :param db_connection: psycopg2 or SQLAlchemy connection object
@@ -35,7 +34,6 @@ class Benchmark:
 
         global shared_benchmark
         shared_benchmark = self
-
 
     def set_sql(self, query: str):
         if os.path.isfile(query):
@@ -103,71 +101,3 @@ class Benchmark:
         if not self.execution_times:
             raise ValueError("Benchmark has not been run yet.")
         return self._run_timestamps
-
-    def _start_web_server(self):
-        try:
-            from fastapi import FastAPI
-            from fastapi.responses import HTMLResponse, JSONResponse
-            import uvicorn
-        except ImportError:
-            raise ImportError("FastAPI and uvicorn are required for visualization. Install with: pip install fastapi uvicorn")
-
-        app = FastAPI()
-
-        @app.get("/", response_class=HTMLResponse)
-        def index():
-            return """
-            <html>
-            <head>
-                <title>Benchmark Timeseries</title>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            </head>
-            <body>
-                <h2>Query Duration (Seconds)</h2>
-                <canvas id="myChart" width="800" height="400"></canvas>
-                <script>
-                    async function loadData() {
-                        const res = await fetch('/data');
-                        const json = await res.json();
-                        const labels = json.map(d => d.sent_at);
-                        const data = json.map(d => parseFloat(d.duration));
-
-                        const ctx = document.getElementById('myChart').getContext('2d');
-                        new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                labels: labels,
-                                datasets: [{
-                                    label: 'Query Duration (s)',
-                                    data: data,
-                                    fill: false,
-                                    borderColor: 'rgb(75, 192, 192)',
-                                    tension: 0.1
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                scales: {
-                                    x: { display: true, title: { display: true, text: 'Timestamp' }},
-                                    y: { display: true, title: { display: true, text: 'Seconds' }}
-                                }
-                            }
-                        });
-                    }
-
-                    loadData();
-                    setInterval(() => location.reload(), 3000);
-                </script>
-            </body>
-            </html>
-            """
-
-        @app.get("/data")
-        def get_data():
-            return JSONResponse(self._run_timestamps)
-
-        def run_server():
-            uvicorn.run(app, host="127.0.0.1", port=8000, log_level="error")
-
-        self._webserver_thread = threading.Thread(target=run_server, daemon=True)
-        self._webserver_thread.start()

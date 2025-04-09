@@ -6,13 +6,17 @@ conn = psycopg2.connect(
     user="postgres",
     password="asdASD123",
     host="localhost",
-    port="5433"
+    port="5432"
 )
 
-benchmark = Benchmark(db_connection=conn, number_of_runs=1000)
+n_runs = 1_000_000
+
+benchmark = Benchmark(db_connection=conn, number_of_runs=n_runs)
 benchmark.set_sql("SELECT 1;")
 
 for result in benchmark:
-    pass
+    print(result)
+    # pass
 
 print(benchmark.get_execution_results())
+# print(benchmark.get_execution_timeseries())
