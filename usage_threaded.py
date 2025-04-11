@@ -13,7 +13,7 @@ Reasoning:
 conn_params = {
     "dbname": "postgres",
     "user": "postgres",
-    "password": "asdASD123",
+    "password": "",
     "host": "localhost",
     "port": "5432"
 }

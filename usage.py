@@ -4,7 +4,7 @@ from pgbenchmark import Benchmark
 conn = psycopg2.connect(
     dbname="postgres",
     user="postgres",
-    password="asdASD123",
+    password="",
     host="localhost",
     port="5432"
 )
