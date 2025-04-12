@@ -16,8 +16,6 @@ execution time of queries over multiple runs, providing detailed metrics about e
 
 ---
 
-## ⚠️ This library is under HEAVY development ⚠️ <br> I'll try to keep everything backwards compatible...
-
 ---
 
 ## Installation
@@ -66,28 +64,86 @@ conn = engine.connect()
 benchmark = Benchmark(db_connection=conn, number_of_runs=5)
 ```
 
+# Example with Parallel or Threaded execution
+
+### ⚠️ Please be careful. If you are running on Linux, `pgbenchmark` will load your cores on 100% !!!⚠️
+
+```python
+from pgbenchmark import ParallelBenchmark  # <<-------- NEW IMPORT
+
+conn_params = {
+    "dbname": "postgres",
+    "user": "postgres",
+    "password": "",
+    "host": "localhost",
+    "port": "5432"
+}
+
+n_procs = 20  # Number of Processes (Cores basically)
+n_runs_per_proc = 1_000
+
+parallel_bench_pg = ParallelBenchmark(
+    num_processes=n_procs,
+    number_of_runs=n_runs_per_proc,
+    db_connection_info=conn_params
+)
+
+parallel_bench_pg.set_sql("SELECT * from information_schema.tables;")  # Same as before
+
+""" Unfortunately, as of now, you can't get execution results on the fly. """
+
+parallel_bench_pg.run()  # RUN THE BENCHMARK 
+
+results_pg = parallel_bench_pg.get_execution_results()
+print(results_pg)
+```
+
 ---
 
-# Example with CLI
+[//]: # ()
 
-`pgbenchmark` Support CLI for easier and faster usages. If you need to check one quick SQL statement(s) without
-boilerplate and Messing around in code, simply install the library and run:
+[//]: # (# Example with CLI)
 
-```shell
-pgbenchmark --sql "SELECT 1;" --runs=1_000_000
-```
+[//]: # ()
 
-### If your benchmark runs long enough, you can view live visualization
+[//]: # (`pgbenchmark` Support CLI for easier and faster usages. If you need to check one quick SQL statement&#40;s&#41; without)
 
-### Add `--visualize=True` flag
+[//]: # (boilerplate and Messing around in code, simply install the library and run:)
 
-```shell
-pgbenchmark --sql "SELECT 1;" --runs=1_000_000 --visualize=True
-```
+[//]: # ()
 
-After running pgbenchmark, go
-to <a href="http://127.0.0.1:4761" class="external-link" target="_blank">http://127.0.0.1:4761</a>.
+[//]: # (```shell)
 
-<img src="examples/ui_screenshot.png" alt="img.png" width="900"/>
+[//]: # (pgbenchmark --sql "SELECT 1;" --runs=1_000_000)
 
-It is live enough for you to have fun. You can choose between `100ms` and `5000ms` refresh intervals.
+[//]: # (```)
+
+[//]: # ()
+
+[//]: # (### If your benchmark runs long enough, you can view live visualization)
+
+[//]: # ()
+
+[//]: # (### Add `--visualize=True` flag)
+
+[//]: # ()
+
+[//]: # (```shell)
+
+[//]: # (pgbenchmark --sql "SELECT 1;" --runs=1_000_000 --visualize=True)
+
+[//]: # (```)
+
+[//]: # ()
+
+[//]: # (After running pgbenchmark, go)
+
+[//]: # (to <a href="http://127.0.0.1:4761" class="external-link" target="_blank">http://127.0.0.1:4761</a>.)
+
+[//]: # ()
+
+[//]: # (<img src="examples/ui_screenshot.png" alt="img.png" width="900"/>)
+
+[//]: # ()
+
+[//]: # (It is live enough for you to have fun. You can choose between `100ms` and `5000ms` refresh intervals.)

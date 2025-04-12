@@ -1,3 +1,6 @@
+*.pyc
+__pycache__/
+
 temp*
 dist*
 pgbenchmark.egg-info*
