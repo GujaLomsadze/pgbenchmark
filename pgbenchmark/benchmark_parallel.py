@@ -3,7 +3,7 @@ import os
 import time
 from datetime import datetime, timezone
 from queue import Empty  # To handle queue timeout if needed, though blocking get is simpler
-from typing import List, Dict, Any, Union, Optional  # Added Optional
+from typing import List, Dict, Any, Union, Optional, Callable  # Added Optional
 
 try:
     import psycopg2
@@ -36,7 +36,7 @@ WORKER_DONE_SENTINEL = None
 
 class ParallelBenchmark:
     """
-    Runs SQL benchmarks concurrently using multiple processes.
+    Runs SQL benchmarks concurrently using multiple processes with templated queries.
 
     Requires pickleable connection information (psycopg2 params dict or SQLAlchemy URL string).
     """
@@ -60,7 +60,8 @@ class ParallelBenchmark:
         if number_of_runs <= 0:
             raise ValueError("Number of runs per process must be positive.")
 
-        self.sql_query: Optional[str] = None
+        self.sql_query_template: Optional[str] = None
+        self._sql_formatter: Dict[str, Callable[[], Any]] = {}
         self.num_processes = num_processes
         self.number_of_runs_per_process = number_of_runs
         self.db_connection_info = db_connection_info
@@ -84,21 +85,33 @@ class ParallelBenchmark:
         self._total_run_duration: float = 0.0  # <--- Initialize total duration
 
     def set_sql(self, query: str):
-        """Sets the SQL query, reading from a file if `query` is a valid path."""
+        """Sets the SQL query template, reading from a file if `query` is a valid path."""
         if os.path.isfile(query):
             with open(query, "r", encoding="utf-8") as f:
-                self.sql_query = f.read().strip()
+                self.sql_query_template = f.read().strip()
         else:
-            self.sql_query = query.strip()
+            self.sql_query_template = query.strip()
 
-    def get_sql(self) -> Optional[str]:
-        """Returns the currently set SQL query."""
-        return self.sql_query
+    def get_sql_template(self) -> Optional[str]:
+        """Returns the currently set SQL query template."""
+        return self.sql_query_template
+
+    def set_sql_formatter(self, for_placeholder: str, generator: Callable[[], Any]):
+        """
+        Sets a generator function for a specific placeholder in the SQL query template.
+
+        :param for_placeholder: The name of the placeholder (e.g., 'value' for '{{value}}').
+        :param generator: A callable (function or lambda) that returns the value to be inserted.
+        """
+        if not callable(generator):
+            raise TypeError("Generator must be a callable function.")
+        self._sql_formatter[for_placeholder] = generator
 
     @staticmethod
     def _worker_process(
             worker_id: int,
-            sql_query: str,
+            sql_formatter: Dict[str, Callable[[], Any]],
+            sql_template: str,
             connection_info: Union[Dict[str, Any], str],
             runs_for_this_process: int,
             results_queue: multiprocessing.Queue
@@ -118,16 +131,11 @@ class ParallelBenchmark:
                     raise RuntimeError("SQLAlchemy not found in worker process.")
                 # Create engine specific to this process
                 engine = create_engine(connection_info)  # Add pool options if needed
-                # Test connection? Optional, execute does this implicitly
-                # with engine.connect() as test_conn:
-                #    test_conn.execute(sqlalchemy_text("SELECT 1"))
-                sql_stmt = sqlalchemy_text(sql_query)  # Prepare statement once
             elif is_psycopg2:
                 if psycopg2 is None:
                     raise RuntimeError("psycopg2 not found in worker process.")
                 # Create connection specific to this process
                 conn = psycopg2.connect(**connection_info)
-                sql_stmt = sql_query  # Use raw query string
             else:
                 # Should not happen based on __init__ checks
                 raise RuntimeError("Invalid database connection configuration.")
@@ -139,15 +147,20 @@ class ParallelBenchmark:
                 start_time = time.time()
                 timestamp_sent = datetime.now(timezone.utc)
                 result_data = {}  # Store result/error for queue
+                formatted_sql = sql_template
+                for placeholder, generator in sql_formatter.items():
+                    value = generator()
+                    formatted_sql = formatted_sql.replace(f"{{{{{placeholder}}}}}", str(value))
 
                 try:
                     if engine:  # SQLAlchemy
+                        sql_stmt = sqlalchemy_text(formatted_sql)
                         with engine.connect() as connection:
                             with connection.begin():  # Transaction
                                 connection.execute(sql_stmt)
                     elif conn:  # psycopg2
                         with conn.cursor() as cursor:
-                            cursor.execute(sql_stmt)
+                            cursor.execute(formatted_sql)
                         conn.commit()
                     else:
                         # Should not happen
@@ -212,9 +225,9 @@ class ParallelBenchmark:
             results_queue.put(WORKER_DONE_SENTINEL)  # Put None (or sentinel) to signal worker finished
 
     def run(self):
-        """Executes the benchmark across multiple processes."""
-        if not self.sql_query:
-            raise ValueError("SQL query is not set. Use set_sql().")
+        """Executes the benchmark across multiple processes with formatted SQL."""
+        if not self.sql_query_template:
+            raise ValueError("SQL query template is not set. Use set_sql().")
 
         # Reset results from previous runs
         self.execution_times = []
@@ -232,7 +245,6 @@ class ParallelBenchmark:
         processes: List[multiprocessing.Process] = []
 
         # --- Start Worker Processes ---
-        # (Worker starting logic remains the same)
         runs_for_each_process = self.number_of_runs_per_process
         if runs_for_each_process == 0:
             print("[MainProcess] Warning: number_of_runs_per_process is 0, no work will be done.")
@@ -246,7 +258,8 @@ class ParallelBenchmark:
                 target=self._worker_process,
                 args=(
                     i,
-                    self.sql_query,
+                    self._sql_formatter,
+                    self.sql_query_template,
                     self.db_connection_info,
                     runs_for_each_process,
                     results_queue
@@ -257,7 +270,6 @@ class ParallelBenchmark:
             process.start()
 
         # --- Collect Results from Queue ---
-        # (Result collection logic remains the same)
         print("[MainProcess] Waiting for results from worker processes...")
         completed_workers = 0
         processed_results = 0
@@ -294,7 +306,6 @@ class ParallelBenchmark:
             f"[MainProcess] All workers signaled completion. Processed {processed_results} results, {processed_errors} errors.")
 
         # --- Join Worker Processes ---
-        # (Joining logic remains the same)
         print("[MainProcess] Joining worker processes...")
         for i, process in enumerate(processes):
             try:
