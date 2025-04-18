@@ -34,7 +34,8 @@ parallel_bench_pg = ParallelBenchmark(
 
 # Define the SQL Query Template
 query = """
-            INSERT INTO products (name, price, stock_quantity) VALUES ('{{product_name}}', {{price_value}}, 10);
+        INSERT INTO products (name, price, stock_quantity)
+        VALUES ('{{product_name}}', {{price_value}}, 10);
         """
 
 # ===============================

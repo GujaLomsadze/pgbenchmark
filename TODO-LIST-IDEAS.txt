@@ -6,6 +6,11 @@ Threaded/Parallel Benchmark:
     ...
 
 
+Pallette:
+      --main: #101820FF;
+      --accent: #FEE715FF;
+
+
 General Features:
     
     [1] GridSearch for best-performance DDL
