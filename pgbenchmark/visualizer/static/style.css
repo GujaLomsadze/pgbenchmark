@@ -1,9 +1,10 @@
 /* Global Styles */
 :root {
-    --dark-bg: #101820FF;
-    --accent-color: #FEE715FF;
+    --dark-bg: #151b23;
+    --accent-color: #ffffff;
     --text-color: #f5f5f5;
-    --secondary-bg: #1a2430;
+    /*--secondary-bg: #1a2430;*/
+    --secondary-bg: #0d1117;
     --border-color: #2a3440;
     --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     --danger-color: #ff5252;

@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pgbenchmark"
-version = "0.1.2"
+version = "0.1.4"
 description = "A Python package to benchmark query performance and comparison on PostgreSQL Database"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "Apache License 2.0"}
+license = { text = "Apache License 2.0" }
 authors = [
-    {name = "Elguja Lomsadze", email = "lomsadze.guja@gmail.com"}
+    { name = "Elguja Lomsadze", email = "lomsadze.guja@gmail.com" }
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -37,14 +37,19 @@ dependencies = [
 pgbenchmark = "pgbenchmark.cli:main"
 
 [tool.setuptools]
-package-dir = {"" = "."}
+package-dir = { "" = "." }
 
 [tool.setuptools.packages.find]
 where = ["."]
 exclude = ["tests*", "docs*"]
 
 [tool.setuptools.package-data]
-pgbenchmark = ["visualizer/static/*.html", "visualizer/static/css/*.css", "visualizer/static/js/*.js"]
+pgbenchmark = [
+    "visualizer/static/*.html",
+    "visualizer/static/*.css",
+    "visualizer/templates/*.html"
+]
+
 
 [tool.black]
 line-length = 88

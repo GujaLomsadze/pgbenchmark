@@ -2,7 +2,7 @@
 
 # pgbenchmark
 
-[![codecov](https://codecov.io/github/GujaLomsadze/pgbenchmark/graph/badge.svg?token=J2VYSHFE1K)](https://codecov.io/github/GujaLomsadze/pgbenchmark)
+[//]: # ([![codecov]&#40;https://codecov.io/github/GujaLomsadze/pgbenchmark/graph/badge.svg?token=J2VYSHFE1K&#41;]&#40;https://codecov.io/github/GujaLomsadze/pgbenchmark&#41;)
 ![PyPI Version](https://img.shields.io/pypi/v/pgbenchmark.svg)
 ![PyPI Downloads](https://img.shields.io/pypi/dm/pgbenchmark.svg)
 
@@ -12,9 +12,6 @@
 Python package to benchmark query performance on a PostgreSQL database. It allows you to measure the
 execution time of queries over multiple runs, providing detailed metrics about each run's performance.
 </h3>
-
-
----
 
 ---
 
@@ -33,11 +30,15 @@ import psycopg2
 from pgbenchmark import Benchmark
 
 conn = psycopg2.connect(
-    "<< YOUR CONNECTION >>"
+    dbname="postgres",
+    user="postgres",
+    password="  << Your Password >> ",
+    host="localhost",
+    port="5432"
 )
 
 benchmark = Benchmark(db_connection=conn, number_of_runs=1000)
-benchmark.set_sql("./test.sql")
+benchmark.set_sql("SELECT 1;")
 
 for result in benchmark:
     # {'run': X, 'sent_at': <DATETIME WITH MS>, 'duration': '0.000064'}
@@ -48,23 +49,30 @@ print(benchmark.get_execution_results())
 # {'runs': 1000, 'min_time': '0.00005', 'max_time': '0.000287', 'avg_time': '0.000072'}
 ```
 
-#### You can also pass raw SQL as a String, instead of file
+#### You can also pass SQL file, instead of query string
 
 ```python
-benchmark.set_sql("SELECT 1;")
+benchmark.set_sql("./test.sql")
 ```
 
-#### It also supports SQLAlchemy connection engine
+---
 
-```python
-engine = create_engine("postgresql+psycopg2://.......")
-conn = engine.connect()
+# Interactive | No-Code Mode
 
-# Set up benchmark class
-benchmark = Benchmark(db_connection=conn, number_of_runs=5)
+### Simply run in your terminal:
+```shell
+pgbenchmark
 ```
+You'll see the ouput 
+```terminaloutput
+[ http://127.0.0.1:8000 ] Click to open pgbenchmark Interface
+```
+![img.png](UI.png)
 
-# Example with Parallel or Threaded execution
+### Configuration on the right, rest is very intuitive.
+Pause and Resume buttons are not working for now :(
+
+# Example with Parallel execution
 
 ### ⚠️ Please be careful. If you are running on Linux, `pgbenchmark` will load your cores on 100% !!!⚠️
 
@@ -99,6 +107,7 @@ print(results_pg)
 ```
 
 # Example with Template Engine
+
 ### From version `0.1.0` pgbenchmark supports simple Template Engine for queries.
 
 ```python
@@ -110,7 +119,7 @@ from pgbenchmark import ParallelBenchmark
 conn_params = {
     "dbname": "postgres",
     "user": "postgres",
-    "password": "asdASD123",
+    "password": "",
     "host": "localhost",
     "port": "5432"
 }
@@ -152,7 +161,6 @@ parallel_bench_pg.set_sql(query)
 # Set formatters
 parallel_bench_pg.set_sql_formatter(for_placeholder="price_value", generator=generate_random_price)
 parallel_bench_pg.set_sql_formatter(for_placeholder="product_name", generator=generate_random_string)
-
 
 # Run Benchmark
 if __name__ == '__main__':
