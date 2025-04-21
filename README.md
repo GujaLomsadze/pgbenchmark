@@ -46,7 +46,17 @@ for result in benchmark:
 
 """ View Summary """
 print(benchmark.get_execution_results())
-# {'runs': 1000, 'min_time': '0.00005', 'max_time': '0.000287', 'avg_time': '0.000072'}
+
+# {'runs': 1000,
+#      'min_time': '0.000576',
+#      'max_time': '0.014741',
+#      'avg_time': '0.0007',
+#      'median_time': '0.000642',
+#      'percentiles': {'p25': '0.000612',
+#                      'p50': '0.000642',
+#                      'p75': '0.000696',
+#                      'p99': '0.001331'}
+#      }
 ```
 
 #### You can also pass SQL file, instead of query string
@@ -67,7 +77,7 @@ You'll see the ouput
 ```terminaloutput
 [ http://127.0.0.1:8000 ] Click to open pgbenchmark Interface
 ```
-![img.png](UI.png)
+![img](https://raw.githubusercontent.com/GujaLomsadze/pgbenchmark/main/UI.png)
 
 ### Configuration on the right, rest is very intuitive.
 Pause and Resume buttons are not working for now :(

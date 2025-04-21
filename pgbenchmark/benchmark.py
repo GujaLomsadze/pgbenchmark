@@ -1,3 +1,4 @@
+import math
 import os
 import time
 import logging
@@ -105,19 +106,28 @@ class Benchmark:
     def get_execution_results(self) -> dict:
         """
         After running, return summary of min, max, average, median, and percentiles.
+        Includes the 99th percentile as well.
         """
         if not self.execution_times:
             raise ValueError("No execution data available. Please run the benchmark.")
 
         times = sorted(self.execution_times)
+
         runs = self._runs
+
         min_time = times[0]
         max_time = times[-1]
+
         avg_time = sum(times) / len(times)
         median_time = statistics.median(times)
+
         # Compute quartile percentiles (25th, 50th, 75th)
         quartiles = statistics.quantiles(times, n=4)
         p25, p50, p75 = quartiles[0], quartiles[1], quartiles[2]
+
+        # Compute 99th percentile using nearest-rank method
+        k = math.ceil(0.99 * len(times))
+        p99 = times[k - 1]
 
         # Helper to format times
         def fmt(val: float) -> str:
@@ -133,6 +143,7 @@ class Benchmark:
                 "p25": fmt(p25),
                 "p50": fmt(p50),
                 "p75": fmt(p75),
+                "p99": fmt(p99),
             },
         }
 
