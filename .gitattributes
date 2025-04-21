@@ -1,5 +1,5 @@
 *.html linguist-vendored
+*.css linguist-vendored
 *.md linguist-vendored
 *.rst linguist-vendored
 *.txt linguist-vendored
-*.css linguist-vendored
