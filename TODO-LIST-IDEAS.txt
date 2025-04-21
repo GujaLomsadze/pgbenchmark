@@ -5,40 +5,5 @@ Benchamark:
 Threaded/Parallel Benchmark:
     ...
 
-
-Pallette:
-      --main: #101820FF;
-      --accent: #FEE715FF;
-
-
-General Features:
-    
-    [1] GridSearch for best-performance DDL
-        User provides possible options of table DDL and software
-        Benchamrks each option provided from the list, returns best-fitting option of DDL
-        Example:
-            | index1.sql:
-                    create index on ......
-            | index2.sql
-                    create index on ......
-            | index3.sql
-                    create index on ......
-
-            benchmark tries:
-                    1. index_1 * index_2 * index_3
-                    2. index_1 * index_3
-                    3. index_1 * index_2
-                    4. index_3
-                    5. index_2
-                    6. index_1
-            
-            and after benchamrk -> gives ordered list of best options
-
-
-        Requires:
-            Feature to perform DDL change while maintaining initial state.
-                yaml or whatever definition language to easily set it up
-                    option 1: User definies .yml or something with different setups, providing sql files
-                    option 2: With code -> Add N amount of variations for DDL
-
-            Feature to insert dummy data into table. I prefer that user takes care of that by him/herself/itself but ... yeah
+General:
+    Move usages and example code in `example` folder or something.

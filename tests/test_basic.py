@@ -10,7 +10,7 @@ from pgbenchmark import Benchmark, ThreadedBenchmark, ParallelBenchmark
 
 def test_benchmark_init():
     bench = Benchmark(db_connection=None, number_of_runs=5)
-    assert bench.number_of_runs == 5
+    assert bench._runs == 5
 
 
 # def test_threaded_benchmark_init():

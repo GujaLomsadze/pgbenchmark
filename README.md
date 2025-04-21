@@ -24,6 +24,7 @@ pip install pgbenchmark
 ---
 
 # Example
+#### For ParallelBenchmark, scroll down....
 
 ```python
 import psycopg2
@@ -82,6 +83,60 @@ You'll see the ouput
 ### Configuration on the right, rest is very intuitive.
 Pause and Resume buttons are not working for now :(
 
+
+# More Exmaples
+### Standard 'Benchmark' class allow all kinds of connections
+
+1. Providing Nothing at all. Benchmark will use standard default factory values
+```python
+from pgbenchmark import Benchmark
+
+benchmark = Benchmark(number_of_runs=1000)
+benchmark.set_sql("SELECT 1;")
+
+for iteration in benchmark:
+    pass
+```
+2. Providing Connection Details as Dict.
+```python
+from pgbenchmark import Benchmark
+
+params = {
+    "dbname": "postgres",
+    "host": "localhost",
+    "port": "5432",
+    "user": "postgres",
+    "password": "postgres",
+}
+
+benchmark = Benchmark(db_connection=params, number_of_runs=1000)
+benchmark.set_sql("SELECT 1;")
+
+for iteration in benchmark:
+    pass
+```
+
+3. Psycopg2 connection object directly
+```python
+from pgbenchmark import Benchmark
+
+params = {
+    "dbname": "postgres",
+    "host": "localhost",
+    "port": "5432",
+    "user": "postgres",
+    "password": "postgres",
+}
+
+benchmark = Benchmark(db_connection=params, number_of_runs=1000)
+benchmark.set_sql("SELECT 1;")
+
+for iteration in benchmark:
+    pass
+```
+
+
+---
 # Example with Parallel execution
 
 ### ⚠️ Please be careful. If you are running on Linux, `pgbenchmark` will load your cores on 100% !!!⚠️

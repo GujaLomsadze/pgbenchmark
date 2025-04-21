@@ -1,12 +1,13 @@
 import os
+import tempfile
 
+import psycopg2
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import psycopg2
+
 from pgbenchmark import Benchmark
-import tempfile
 
 app = FastAPI()
 static_dir = os.path.join(os.path.dirname(__file__), "static")

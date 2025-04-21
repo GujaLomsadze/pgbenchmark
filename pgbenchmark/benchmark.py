@@ -4,8 +4,9 @@ import os
 import statistics
 import time
 from datetime import datetime, timezone
-from typing import Generator, Optional
+from typing import Generator, Optional, Union, Dict, Any
 
+import psycopg2
 from psycopg2.extensions import connection as psycopg2_connection
 
 __all__ = ["Benchmark"]
@@ -27,12 +28,51 @@ class Benchmark:
 
     def __init__(
             self,
-            db_connection: psycopg2_connection,
+            db_connection: Optional[Union[Dict[str, Any], psycopg2_connection]] = None,
             number_of_runs: int = 1,
     ):
         if number_of_runs < 1:
             raise ValueError("number_of_runs must be at least 1.")
 
+        _is_psycopg2_params = isinstance(db_connection, dict)
+        _is_psycopg2_conn = isinstance(db_connection, psycopg2_connection)
+
+        defaults = {
+            "dbname": "postgres",
+            "host": "localhost",
+            "port": "5432",
+            "user": "postgres",
+            "password": "postgres",
+        }
+
+        if db_connection is None:
+            # If db_connection is None, set defaults
+            print(f"Using default database connection values. {db_connection}")
+            db_connection = psycopg2.connect(**defaults)
+
+        elif _is_psycopg2_params:
+            missing_params = []
+            for key, default_value in defaults.items():
+                if key not in db_connection:
+                    missing_params.append(key)
+                    db_connection[key] = default_value
+
+            if missing_params:
+                print(f"Using default values for: {', '.join(missing_params)}")
+
+            # Ensure 'password' is provided
+            if "password" not in db_connection:
+                raise ValueError("The 'password' parameter is required but missing.")
+
+            # Connect to the database
+            db_connection = psycopg2.connect(
+                **db_connection,
+            )
+
+        elif _is_psycopg2_conn:
+            db_connection = db_connection
+
+        # Store the connection and run count
         self._db = db_connection
         self._runs = number_of_runs
         self._sql: Optional[str] = None
