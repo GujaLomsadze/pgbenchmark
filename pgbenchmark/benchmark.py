@@ -1,15 +1,12 @@
+import logging
 import math
 import os
-import time
-import logging
-from datetime import datetime, timezone
-from typing import Generator, Union, Optional
 import statistics
+import time
+from datetime import datetime, timezone
+from typing import Generator, Optional
 
-try:
-    from sqlalchemy.engine import Connection as SQLAlchemyConnection
-except ImportError:
-    SQLAlchemyConnection = None
+from psycopg2.extensions import connection as psycopg2_connection
 
 __all__ = ["Benchmark"]
 
@@ -30,7 +27,7 @@ class Benchmark:
 
     def __init__(
             self,
-            db_connection: Union[any, "SQLAlchemyConnection"],
+            db_connection: psycopg2_connection,
             number_of_runs: int = 1,
     ):
         if number_of_runs < 1:
@@ -41,11 +38,6 @@ class Benchmark:
         self._sql: Optional[str] = None
         self.execution_times: list[float] = []
         self._timestamps: list[dict] = []
-
-        self._is_sqlalchemy = (
-            SQLAlchemyConnection is not None
-            and isinstance(self._db, SQLAlchemyConnection)
-        )
 
         global shared_benchmark
         shared_benchmark = self
@@ -82,15 +74,12 @@ class Benchmark:
             sent = datetime.now(timezone.utc)
 
             try:
-                if self._is_sqlalchemy:
-                    self._db.execute(sql)
-                    self._db.commit()
-                else:
-                    cursor = self._db.cursor()
-                    cursor.execute(sql)
-                    self._db.commit()
-                    cursor.close()
+                cursor = self._db.cursor()
+                cursor.execute(sql)
+                self._db.commit()
+                cursor.close()
             except Exception as exc:
+                # TODO: Adding Retries soon enough
                 logger.exception("Query execution failed.")
                 raise RuntimeError(f"Error executing query: {exc}") from exc
 
