@@ -3,6 +3,7 @@ import time
 import logging
 from datetime import datetime, timezone
 from typing import Generator, Union, Optional
+import statistics
 
 try:
     from sqlalchemy.engine import Connection as SQLAlchemyConnection
@@ -41,8 +42,8 @@ class Benchmark:
         self._timestamps: list[dict] = []
 
         self._is_sqlalchemy = (
-                SQLAlchemyConnection is not None
-                and isinstance(self._db, SQLAlchemyConnection)
+            SQLAlchemyConnection is not None
+            and isinstance(self._db, SQLAlchemyConnection)
         )
 
         global shared_benchmark
@@ -103,18 +104,36 @@ class Benchmark:
 
     def get_execution_results(self) -> dict:
         """
-        After running, return summary of min, max and average durations.
+        After running, return summary of min, max, average, median, and percentiles.
         """
         if not self.execution_times:
             raise ValueError("No execution data available. Please run the benchmark.")
 
-        times = self.execution_times
+        times = sorted(self.execution_times)
+        runs = self._runs
+        min_time = times[0]
+        max_time = times[-1]
+        avg_time = sum(times) / len(times)
+        median_time = statistics.median(times)
+        # Compute quartile percentiles (25th, 50th, 75th)
+        quartiles = statistics.quantiles(times, n=4)
+        p25, p50, p75 = quartiles[0], quartiles[1], quartiles[2]
+
+        # Helper to format times
+        def fmt(val: float) -> str:
+            return f"{val:.6f}".rstrip('0').rstrip('.')
 
         return {
-            "runs": self._runs,
-            "min_time": f"{min(times):.6f}".rstrip('0').rstrip('.'),
-            "max_time": f"{max(times):.6f}".rstrip('0').rstrip('.'),
-            "avg_time": f"{(sum(times) / len(times)):.6f}".rstrip('0').rstrip('.'),
+            "runs": runs,
+            "min_time": fmt(min_time),
+            "max_time": fmt(max_time),
+            "avg_time": fmt(avg_time),
+            "median_time": fmt(median_time),
+            "percentiles": {
+                "p25": fmt(p25),
+                "p50": fmt(p50),
+                "p75": fmt(p75),
+            },
         }
 
     def get_execution_timeseries(self) -> list[dict]:
