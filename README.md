@@ -3,8 +3,8 @@
 # pgbenchmark
 
 [//]: # ([![codecov]&#40;https://codecov.io/github/GujaLomsadze/pgbenchmark/graph/badge.svg?token=J2VYSHFE1K&#41;]&#40;https://codecov.io/github/GujaLomsadze/pgbenchmark&#41;)
-![PyPI Version](https://img.shields.io/pypi/v/pgbenchmark.svg)
-![PyPI Downloads](https://img.shields.io/pypi/dm/pgbenchmark.svg)
+![PyPI Version](https://img.shields.io/pypi/v/pgbenchmark.svg?style=for-the-badge)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/pgbenchmark?style=for-the-badge)
 
 </div>
 
@@ -12,8 +12,6 @@
 Python package to benchmark query performance on a PostgreSQL database. It allows you to measure the
 execution time of queries over multiple runs, providing detailed metrics about each run's performance.
 </h3>
-
----
 
 ## Installation
 
