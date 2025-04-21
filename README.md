@@ -24,6 +24,7 @@ pip install pgbenchmark
 ---
 
 # Example
+
 #### For ParallelBenchmark, scroll down....
 
 ```python
@@ -71,23 +72,29 @@ benchmark.set_sql("./test.sql")
 # Interactive | No-Code Mode
 
 ### Simply run in your terminal:
+
 ```shell
 pgbenchmark
 ```
-You'll see the ouput 
+
+You'll see the ouput
+
 ```terminaloutput
 [ http://127.0.0.1:8000 ] Click to open pgbenchmark Interface
 ```
+
 ![img](https://raw.githubusercontent.com/GujaLomsadze/pgbenchmark/main/UI.png)
 
 ### Configuration on the right, rest is very intuitive.
+
 Pause and Resume buttons are not working for now :(
 
+# More Examples
 
-# More Exmaples
 ### Standard 'Benchmark' class allow all kinds of connections
 
 1. Providing Nothing at all. Benchmark will use standard default factory values
+
 ```python
 from pgbenchmark import Benchmark
 
@@ -97,7 +104,9 @@ benchmark.set_sql("SELECT 1;")
 for iteration in benchmark:
     pass
 ```
+
 2. Providing Connection Details as Dict.
+
 ```python
 from pgbenchmark import Benchmark
 
@@ -117,6 +126,7 @@ for iteration in benchmark:
 ```
 
 3. Psycopg2 connection object directly
+
 ```python
 from pgbenchmark import Benchmark
 
@@ -135,8 +145,8 @@ for iteration in benchmark:
     pass
 ```
 
-
 ---
+
 # Example with Parallel execution
 
 ### ⚠️ Please be careful. If you are running on Linux, `pgbenchmark` will load your cores on 100% !!!⚠️
