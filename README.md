@@ -13,6 +13,18 @@ Python package to benchmark query performance on a PostgreSQL database. It allow
 execution time of queries over multiple runs, providing detailed metrics about each run's performance.
 </h3>
 
+---
+
+### Please consider
+
+1. Main purpose of this library is to easily microbenchmark queries without boilerplate.
+2. This tool is not for Database Administrators (Yet).
+3. There's a lot of re-thinking and work in progress ongoing on this project
+4. Most of the things will be backwards-compatible, but some things might deprecate/break in future releases.
+5. Since I'm developing this library as I go, mostly for my personal use, code here and there is sub-optimal.
+
+---
+
 ## Installation
 
 ```shell
