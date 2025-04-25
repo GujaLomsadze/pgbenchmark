@@ -1,31 +1,32 @@
 from pgbenchmark import ParallelBenchmark
 
+pg_conn_params = {
+    "dbname": "postgres",
+    "user": "postgres",
+    "password": "",
+    "host": "localhost",
+    "port": "5432"
+}
+
+# --- Configuration ---
+N_PROCS = 20
+N_RUNS_PER_PROC = 1000
+SQL_QUERY = "SELECT 1;"
+
+parallel_bench = ParallelBenchmark(
+    num_processes=N_PROCS,
+    number_of_runs=N_RUNS_PER_PROC,
+    db_connection_info=pg_conn_params
+)
+parallel_bench.set_sql(SQL_QUERY)
+
 if __name__ == '__main__':
-    conn_params = {
-        "dbname": "postgres",
-        "user": "postgres",
-        "password": "asdASD123",
-        "host": "localhost",
-        "port": "5432"
-    }
+    print("===================== Simply `run()` and get results at the end ==============================")
 
-    n_procs = 10
-    n_runs_per_proc = 10_000
+    parallel_bench.run()
 
-    parallel_bench_pg = ParallelBenchmark(
-        num_processes=n_procs,
-        number_of_runs=n_runs_per_proc,
-        db_connection_info=conn_params
-    )
-    parallel_bench_pg.set_sql("SELECT * from information_schema.tables;")  # Faster query
+    print("===================== Or... Iterate Live and get results per-process =========================")
+    for result_from_process in parallel_bench.iter_successful_results():
+        print(result_from_process)
 
-    """ Unfortunately, as of now, you can't get execution results on the fly. """
-
-    parallel_bench_pg.run()
-
-    results_pg = parallel_bench_pg.get_execution_results()
-
-    throughput = results_pg["throughput_runs_per_sec"]
-    avg_time = results_pg["avg_time"]
-
-    print(throughput)
+    final_results = parallel_bench.get_execution_results()

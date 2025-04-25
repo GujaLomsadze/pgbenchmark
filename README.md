@@ -162,7 +162,7 @@ for iteration in benchmark:
 ### ⚠️ Please be careful. If you are running on Linux, `pgbenchmark` will load your cores on 100% !!!⚠️
 
 ```python
-from pgbenchmark import ParallelBenchmark  # <<-------- NEW IMPORT
+from pgbenchmark import ParallelBenchmark
 
 conn_params = {
     "dbname": "postgres",

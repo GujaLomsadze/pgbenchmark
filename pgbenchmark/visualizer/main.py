@@ -37,8 +37,10 @@ async def websocket_endpoint(websocket: WebSocket):
         conn_str = init.get("connection")
         sql_text = init.get("sql")
         runs = int(init.get("runs", 1))
+
         conn = psycopg2.connect(conn_str)
         benchmark = Benchmark(db_connection=conn, number_of_runs=runs)
+
         with tempfile.NamedTemporaryFile("w+", suffix=".sql", delete=False) as f:
             f.write(sql_text)
             f.flush()
