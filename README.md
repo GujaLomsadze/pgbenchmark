@@ -2,9 +2,11 @@
 
 # pgbenchmark
 
-[//]: # ([![codecov]&#40;https://codecov.io/github/GujaLomsadze/pgbenchmark/graph/badge.svg?token=J2VYSHFE1K&#41;]&#40;https://codecov.io/github/GujaLomsadze/pgbenchmark&#41;)
 ![PyPI Version](https://img.shields.io/pypi/v/pgbenchmark.svg?style=for-the-badge)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/pgbenchmark?style=for-the-badge)
+<br>
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/GujaLomsadze/pgbenchmark?style=for-the-badge)
+![GitHub contributors](https://img.shields.io/github/contributors/GujaLomsadze/pgbenchmark?style=for-the-badge&color=black)
 
 </div>
 
