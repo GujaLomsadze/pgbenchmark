@@ -1,4 +1,10 @@
 from pgbenchmark import ParallelBenchmark
+import random
+
+
+def generate_random_value():
+    return round(random.randint(10, 1000), 2)
+
 
 pg_conn_params = {
     "dbname": "postgres",
@@ -20,12 +26,9 @@ parallel_bench = ParallelBenchmark(
 )
 parallel_bench.set_sql(SQL_QUERY)
 
+parallel_bench.set_sql_formatter(for_placeholder="random_value", generator=generate_random_value)
+
 if __name__ == '__main__':
-    print("===================== Simply `run()` and get results at the end ==============================")
-
-    parallel_bench.run()
-
-    print("===================== Or... Iterate Live and get results per-process =========================")
     for result_from_process in parallel_bench.iter_successful_results():
         print(result_from_process)
 

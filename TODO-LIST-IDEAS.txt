@@ -1,9 +1,0 @@
-Benchamark:
-    ...
-
-
-Threaded/Parallel Benchmark:
-    ...
-
-General:
-    Move usages and example code in `example` folder or something.

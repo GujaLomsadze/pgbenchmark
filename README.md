@@ -164,7 +164,7 @@ for iteration in benchmark:
 ```python
 from pgbenchmark import ParallelBenchmark
 
-conn_params = {
+pg_conn_params = {
     "dbname": "postgres",
     "user": "postgres",
     "password": "",
@@ -172,96 +172,57 @@ conn_params = {
     "port": "5432"
 }
 
-n_procs = 20  # Number of Processes (Cores basically)
-n_runs_per_proc = 1_000
+# --- Configuration ---
+N_PROCS = 20
+N_RUNS_PER_PROC = 1000
+SQL_QUERY = "SELECT 1;"
 
-parallel_bench_pg = ParallelBenchmark(
-    num_processes=n_procs,
-    number_of_runs=n_runs_per_proc,
-    db_connection_info=conn_params
+parallel_bench = ParallelBenchmark(
+    num_processes=N_PROCS,
+    number_of_runs=N_RUNS_PER_PROC,
+    db_connection_info=pg_conn_params
 )
+parallel_bench.set_sql(SQL_QUERY)
 
-parallel_bench_pg.set_sql("SELECT * from information_schema.tables;")  # Same as before
+if __name__ == '__main__':
 
-""" Unfortunately, as of now, you can't get execution results on the fly. """
+    print("===================== Simply `run()` and get results at the end ==============================")
 
-parallel_bench_pg.run()  # RUN THE BENCHMARK 
+    parallel_bench.run()
 
-results_pg = parallel_bench_pg.get_execution_results()
-print(results_pg)
+    print("===================== Or... Iterate Live and get results per-process =========================")
+    for result_from_process in parallel_bench.iter_successful_results():
+        print(result_from_process)
+
+    final_results = parallel_bench.get_execution_results()
 ```
 
 # Example with Template Engine
 
 ### From version `0.1.0` pgbenchmark supports simple Template Engine for queries.
 
+<h3>
+
+To emulate "real" scenarios, with different random or pre-defined queries, you can use `set_sql_formatter` method <br>
+to generate queries. Same syntax as Jinja2 using `{{ [X] }}` for variables.
+
+</h3>
+
 ```python
-import random
-import string
-
-from pgbenchmark import ParallelBenchmark
-
-conn_params = {
-    "dbname": "postgres",
-    "user": "postgres",
-    "password": "",
-    "host": "localhost",
-    "port": "5432"
-}
-
-n_procs = 20
-n_runs_per_proc = 10
-
-
-# Generator Function for Random Product Price
-def generate_random_price():
+def generate_random_value():
     return round(random.randint(10, 1000), 2)
 
 
-# Generator Function for Random Product Name (String)
-def generate_random_string(length=10):
-    characters = string.ascii_letters + string.digits
-    return ''.join(random.choice(characters) for _ in range(length))
+N_RUNS_PER_PROC = 1000
 
+SQL_QUERY = "SELECT {{random_value}};"
 
-parallel_bench_pg = ParallelBenchmark(
-    num_processes=n_procs,
-    number_of_runs=n_runs_per_proc,
-    db_connection_info=conn_params
-)
+# ....
 
-# Define the SQL Query Template
-query = """
-            INSERT INTO products (name, price, stock_quantity) VALUES ('{{product_name}}', {{price_value}}, 10);
-        """
+parallel_bench.set_sql(SQL_QUERY)
 
-# ===============================
-# Note that similar to Jinja2, you have to define template variables within Query
-#   {{product_name}}
-#   {{price_value}}
-# ===============================
-
-parallel_bench_pg.set_sql(query)
-
-# Set formatters
-parallel_bench_pg.set_sql_formatter(for_placeholder="price_value", generator=generate_random_price)
-parallel_bench_pg.set_sql_formatter(for_placeholder="product_name", generator=generate_random_string)
-
-# Run Benchmark
-if __name__ == '__main__':
-    # Run the Parallel Benchmark
-    parallel_bench_pg.run()
-
-    results_pg = parallel_bench_pg.get_execution_results()
-
-    throughput = results_pg["throughput_runs_per_sec"]
-    avg_time = results_pg["avg_time"]
-
-    print("\n=============================================================================")
-    print("                           Benchmark Results                             ")
-    print("=============================================================================")
-    print(f"Throughput (runs/sec): {throughput}")
-    print(f"Average Execution Time (sec): {avg_time}")
+"""===================== use `ANY` function to generate values for your query =============================="""
+parallel_bench.set_sql_formatter(for_placeholder="random_value", generator=generate_random_value)
 ```
 
 ---
