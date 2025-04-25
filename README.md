@@ -35,7 +35,7 @@ pip install pgbenchmark
 
 # Example
 
-#### For ParallelBenchmark, scroll down....
+#### For ParallelBenchmark, please scroll down....
 
 ```python
 import psycopg2
