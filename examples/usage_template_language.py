@@ -1,5 +1,6 @@
-from pgbenchmark import ParallelBenchmark
 import random
+
+from pgbenchmark import ParallelBenchmark
 
 
 def generate_random_value():
@@ -11,7 +12,7 @@ pg_conn_params = {
     "user": "postgres",
     "password": "",
     "host": "localhost",
-    "port": "5432"
+    "port": "5432",
 }
 
 # --- Configuration ---
@@ -22,13 +23,15 @@ SQL_QUERY = "SELECT 1;"
 parallel_bench = ParallelBenchmark(
     num_processes=N_PROCS,
     number_of_runs=N_RUNS_PER_PROC,
-    db_connection_info=pg_conn_params
+    db_connection_info=pg_conn_params,
 )
 parallel_bench.set_sql(SQL_QUERY)
 
-parallel_bench.set_sql_formatter(for_placeholder="random_value", generator=generate_random_value)
+parallel_bench.set_sql_formatter(
+    for_placeholder="random_value", generator=generate_random_value
+)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     for result_from_process in parallel_bench.iter_successful_results():
         print(result_from_process)
 

@@ -5,7 +5,7 @@ Trying to figure out how to emulate local database to test this library easily. 
 =================================
 """
 
-from pgbenchmark import Benchmark, ThreadedBenchmark, ParallelBenchmark
+from pgbenchmark import Benchmark, ParallelBenchmark, ThreadedBenchmark
 
 
 def test_benchmark_init():

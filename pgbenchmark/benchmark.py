@@ -4,7 +4,7 @@ import os
 import statistics
 import time
 from datetime import datetime, timezone
-from typing import Generator, Optional, Union, Dict, Any
+from typing import Any, Dict, Generator, Optional, Union
 
 import psycopg2
 from psycopg2.extensions import connection as psycopg2_connection
@@ -27,9 +27,9 @@ class Benchmark:
         )
 
     def __init__(
-            self,
-            db_connection: Optional[Union[Dict[str, Any], psycopg2_connection]] = None,
-            number_of_runs: int = 1,
+        self,
+        db_connection: Optional[Union[Dict[str, Any], psycopg2_connection]] = None,
+        number_of_runs: int = 1,
     ):
         if number_of_runs < 1:
             raise ValueError("number_of_runs must be at least 1.")
@@ -126,7 +126,7 @@ class Benchmark:
             duration = time.time() - start
             self.execution_times.append(duration)
 
-            duration_str = f"{duration:.6f}".rstrip('0').rstrip('.')
+            duration_str = f"{duration:.6f}".rstrip("0").rstrip(".")
             record = {"sent_at": sent.isoformat(), "duration": duration_str}
             self._timestamps.append(record)
 
@@ -160,7 +160,7 @@ class Benchmark:
 
         # Helper to format times
         def fmt(val: float) -> str:
-            return f"{val:.6f}".rstrip('0').rstrip('.')
+            return f"{val:.6f}".rstrip("0").rstrip(".")
 
         return {
             "runs": runs,

@@ -2,7 +2,7 @@ import os
 import threading
 import time
 from datetime import datetime, timezone
-from typing import Union, List, Dict, Any
+from typing import Any, Dict, List, Union
 
 try:
     import psycopg2
@@ -31,10 +31,10 @@ class ThreadedBenchmark:
     """
 
     def __init__(
-            self,
-            num_threads: int,
-            number_of_runs: int,  # <--- This now means runs PER THREAD
-            db_connection_info: Union[Dict[str, Any], "SQLAlchemyEngine"],
+        self,
+        num_threads: int,
+        number_of_runs: int,  # <--- This now means runs PER THREAD
+        db_connection_info: Union[Dict[str, Any], "SQLAlchemyEngine"],
     ):
         """
         :param num_threads: The number of concurrent threads to use.
@@ -55,15 +55,23 @@ class ThreadedBenchmark:
         self.num_threads = num_threads
         self.number_of_runs_per_thread = number_of_runs  # Store with a descriptive name
         self.db_connection_info = db_connection_info
-        self._is_sqlalchemy = SQLAlchemyEngine is not None and isinstance(db_connection_info, SQLAlchemyEngine)
+        self._is_sqlalchemy = SQLAlchemyEngine is not None and isinstance(
+            db_connection_info, SQLAlchemyEngine
+        )
         self._is_psycopg2 = isinstance(db_connection_info, dict)
 
         if not self._is_sqlalchemy and not self._is_psycopg2:
-            raise TypeError("db_connection_info must be a dict for psycopg2 or a SQLAlchemy Engine.")
+            raise TypeError(
+                "db_connection_info must be a dict for psycopg2 or a SQLAlchemy Engine."
+            )
         if self._is_psycopg2 and psycopg2 is None:
-            raise ImportError("psycopg2 library is required when providing connection parameters as dict.")
+            raise ImportError(
+                "psycopg2 library is required when providing connection parameters as dict."
+            )
         if self._is_sqlalchemy and SQLAlchemyEngine is None:
-            raise ImportError("SQLAlchemy library is required when providing an Engine object.")
+            raise ImportError(
+                "SQLAlchemy library is required when providing an Engine object."
+            )
 
         # Thread-safe storage for results
         self.execution_times: List[float] = []
@@ -134,12 +142,12 @@ class ThreadedBenchmark:
 
                 end_time = time.time()
                 duration = round(end_time - start_time, 6)
-                duration_str = format(duration, '.6f').rstrip('0').rstrip('.')
+                duration_str = format(duration, ".6f").rstrip("0").rstrip(".")
 
                 record = {
                     "sent_at": timestamp_sent.isoformat(),
                     "duration": duration_str,
-                    "duration_float": duration  # Keep float for calculations
+                    "duration_float": duration,  # Keep float for calculations
                 }
                 results_local.append(record)
 
@@ -148,10 +156,12 @@ class ThreadedBenchmark:
                 with self._lock:
                     for record in results_local:
                         self.execution_times.append(record["duration_float"])
-                        self._run_timestamps.append({
-                            "sent_at": record["sent_at"],
-                            "duration": record["duration"]
-                        })
+                        self._run_timestamps.append(
+                            {
+                                "sent_at": record["sent_at"],
+                                "duration": record["duration"],
+                            }
+                        )
 
         except Exception as e:
             # Catch errors during connection setup or other unexpected issues
@@ -190,7 +200,7 @@ class ThreadedBenchmark:
             thread = threading.Thread(
                 target=self._worker,
                 args=(runs_for_each_thread,),  # Pass runs_per_thread to worker
-                name=f"Worker-{i + 1}"
+                name=f"Worker-{i + 1}",
             )
             threads.append(thread)
             thread.start()
@@ -213,9 +223,13 @@ class ThreadedBenchmark:
         # Verify run count against the total expected runs
         actual_runs_completed = len(self.execution_times)
         if actual_runs_completed != total_expected_runs and not self._errors:
-            print(f"Warning: Expected {total_expected_runs} total results, but collected {actual_runs_completed}. "
-                  f"This might happen if threads finished unexpectedly without errors.")
-        elif actual_runs_completed == 0 and not self._errors and total_expected_runs > 0:
+            print(
+                f"Warning: Expected {total_expected_runs} total results, but collected {actual_runs_completed}. "
+                f"This might happen if threads finished unexpectedly without errors."
+            )
+        elif (
+            actual_runs_completed == 0 and not self._errors and total_expected_runs > 0
+        ):
             print("Warning: No results collected and no errors reported.")
 
     def get_execution_results(self) -> Dict[str, Any]:
@@ -232,9 +246,13 @@ class ThreadedBenchmark:
         with self._lock:
             if not self.execution_times:
                 if self._errors:
-                    raise ValueError("Benchmark ran with errors and produced no successful results.")
+                    raise ValueError(
+                        "Benchmark ran with errors and produced no successful results."
+                    )
                 else:
-                    raise ValueError("Benchmark has not been run yet or produced no results.")
+                    raise ValueError(
+                        "Benchmark has not been run yet or produced no results."
+                    )
 
             actual_runs = len(self.execution_times)
             if actual_runs == 0:  # Should be caught above, but double check
@@ -250,9 +268,9 @@ class ThreadedBenchmark:
                 "num_threads": self.num_threads,
                 "total_expected_runs": total_expected_runs,
                 "actual_runs_completed": actual_runs,  # Number of successful runs recorded
-                "min_time": format(min_time, '.6f').rstrip('0').rstrip('.'),
-                "max_time": format(max_time, '.6f').rstrip('0').rstrip('.'),
-                "avg_time": format(avg_time, '.6f').rstrip('0').rstrip('.'),
+                "min_time": format(min_time, ".6f").rstrip("0").rstrip("."),
+                "max_time": format(max_time, ".6f").rstrip("0").rstrip("."),
+                "avg_time": format(avg_time, ".6f").rstrip("0").rstrip("."),
                 "errors": len(self._errors),
             }
 
@@ -269,8 +287,12 @@ class ThreadedBenchmark:
             if not self._run_timestamps:
                 # Check if errors occurred, as that might be why there are no results
                 if self._errors:
-                    raise ValueError("Benchmark ran with errors and produced no successful results.")
+                    raise ValueError(
+                        "Benchmark ran with errors and produced no successful results."
+                    )
                 else:
-                    raise ValueError("Benchmark has not been run yet or produced no results.")
+                    raise ValueError(
+                        "Benchmark has not been run yet or produced no results."
+                    )
             # Return a copy to prevent external modification
             return list(self._run_timestamps)

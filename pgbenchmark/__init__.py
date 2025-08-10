@@ -4,5 +4,5 @@ classes Completely independent of each other.
 """
 
 from .benchmark import Benchmark
-from .benchmark_threaded import ThreadedBenchmark
 from .benchmark_parallel import ParallelBenchmark
+from .benchmark_threaded import ThreadedBenchmark

@@ -72,7 +72,10 @@ async def websocket_endpoint(websocket: WebSocket):
                         break
                     # Busy-wait pause; could add sleep
                     await websocket.receive_text()
-                payload = {"timestamp": result["sent_at"], "value": float(result["duration"])}
+                payload = {
+                    "timestamp": result["sent_at"],
+                    "value": float(result["duration"]),
+                }
                 await websocket.send_json(payload)
         except WebSocketDisconnect:
             pass
@@ -81,4 +84,5 @@ async def websocket_endpoint(websocket: WebSocket):
 
     # Run consumer and producer concurrently
     import asyncio
+
     await asyncio.gather(producer(), consumer())

@@ -1,4 +1,5 @@
 import psycopg2
+
 from pgbenchmark import Benchmark
 
 pg_conn_params = {
@@ -6,7 +7,7 @@ pg_conn_params = {
     "user": "postgres",
     "password": "",
     "host": "localhost",
-    "port": "5432"
+    "port": "5432",
 }
 
 benchmark = Benchmark(number_of_runs=1000, db_connection=pg_conn_params)
